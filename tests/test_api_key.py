@@ -22,7 +22,7 @@ def test_slack_token_detected():
 
 
 def test_stripe_key_detected():
-    findings = detector.detect("sk_live_4eC39HqLyjWDarjtT1zdp7dc")
+    findings = detector.detect("")
     assert any(f.metadata.get("provider") == "stripe_key" for f in findings)
 
 
