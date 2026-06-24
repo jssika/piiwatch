@@ -1,0 +1,22 @@
+[project]
+name = "piiwatch"
+version = "0.1.0"
+description = "Open-source AI-powered platform for detecting and preventing sensitive data leakage in enterprise systems."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = ["click>=8.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "pytest-cov"]
+ai = ["anthropic>=0.40.0"]
+
+[project.scripts]
+piiwatch = "piiwatch.cli:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
