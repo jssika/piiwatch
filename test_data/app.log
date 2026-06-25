@@ -1,0 +1,20 @@
+2024-03-15 08:12:03 INFO  [auth] User login successful: alice.johnson@acmecorp.com from 192.168.1.42
+2024-03-15 08:12:45 INFO  [onboarding] New account created for bob.smith@techventures.io, phone: (312) 555-0148
+2024-03-15 08:13:11 DEBUG [db] Query executed in 12ms: SELECT * FROM users WHERE email='carol.white@healthcare.org'
+2024-03-15 08:14:02 WARN  [kyc] Identity verification started for SSN 523-45-6781, user_id=8821
+2024-03-15 08:15:30 INFO  [support] Ticket #9034 opened by david.nguyen@globalbank.com, contact: 415-867-5309
+2024-03-15 08:16:08 ERROR [payment] Card declined for transaction TXN-4492, user: eve.martinez@retailco.net
+2024-03-15 08:17:44 INFO  [audit] Admin frank.lee@acmecorp.com updated record for SSN 201-76-0452
+2024-03-15 08:18:19 DEBUG [session] Token refreshed for grace.kim@acmecorp.com, session_id=sess_8f3k2p
+2024-03-15 08:19:55 INFO  [shipping] Order #77342 dispatched to henry.chen@customers.io, phone: (773) 555-0290
+2024-03-15 08:20:33 WARN  [compliance] PII found in unencrypted field: SSN 374-82-1039, record_id=REC-0091
+2024-03-15 08:21:10 INFO  [crm] Contact updated: iris.patel@enterprise.com, mobile +1 650-555-0174
+2024-03-15 08:22:47 ERROR [auth] Failed login attempt for james.wilson@techventures.io (5 attempts)
+2024-03-15 08:23:15 INFO  [signup] New user: karen.brown@startup.ai, ref=CAMP-2024
+2024-03-15 08:24:58 DEBUG [export] CSV export triggered by liam.davis@acmecorp.com, rows=4200
+2024-03-15 08:25:30 INFO  [kyc] SSN validated successfully: 289-54-3017, status=PASS
+2024-03-15 08:26:02 WARN  [log-scrub] Unredacted value in request body: mia.taylor@healthcare.org
+2024-03-15 08:27:19 INFO  [billing] Invoice emailed to noah.anderson@globalbank.com, amount=$349.00
+2024-03-15 08:28:44 DEBUG [api] Inbound request from olivia.thomas@retailco.net, endpoint=/v2/profile
+2024-03-15 08:29:13 INFO  [2fa] SMS sent to (214) 555-0387 for user_id=5512
+2024-03-15 08:30:00 INFO  [health] Service OK — uptime 99.98%

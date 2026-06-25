@@ -1,0 +1,11 @@
+user_id,first_name,last_name,email,phone,ssn,date_of_birth,plan
+1001,Alice,Johnson,alice.johnson@acmecorp.com,(312) 555-0148,523-45-6781,1985-04-12,premium
+1002,Bob,Smith,bob.smith@techventures.io,415-867-5309,201-76-0452,1979-11-30,basic
+1003,Carol,White,carol.white@healthcare.org,(773) 555-0290,374-82-1039,1992-07-08,enterprise
+1004,David,Nguyen,david.nguyen@globalbank.com,+1 650-555-0174,289-54-3017,1988-02-19,premium
+1005,Eve,Martinez,eve.martinez@retailco.net,(214) 555-0387,512-63-9284,1995-09-25,basic
+1006,Frank,Lee,frank.lee@acmecorp.com,(917) 555-0623,338-71-4856,1981-12-03,enterprise
+1007,Grace,Kim,grace.kim@acmecorp.com,312-555-0901,447-29-6073,1990-06-17,premium
+1008,Henry,Chen,henry.chen@customers.io,(404) 555-0712,256-84-5190,1983-03-28,basic
+1009,Iris,Patel,iris.patel@enterprise.com,+1 303-555-0255,619-37-8402,1997-01-14,enterprise
+1010,James,Wilson,james.wilson@techventures.io,(602) 555-0489,432-15-7698,1975-08-06,premium

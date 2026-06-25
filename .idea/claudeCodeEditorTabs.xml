@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ClaudeCodeEditorTabs">
-    <option name="activeSessionId" value="607f3408-56e6-45de-b701-eecdcddf3069" />
+    <option name="activeSessionId" value="403ca504-833e-481e-813c-2d0a528a96f1" />
     <option name="openSessionIds">
       <list>
         <option value="c0bed0cd-f5f0-470a-a339-5bcd022794ac" />
         <option value="ed04cedb-ed13-4de3-8166-00c96a35bb30" />
         <option value="6099fcee-fda1-4202-b63d-55cf185c48e1" />
-        <option value="607f3408-56e6-45de-b701-eecdcddf3069" />
+        <option value="403ca504-833e-481e-813c-2d0a528a96f1" />
       </list>
     </option>
     <option name="sessionPaths">
       <map>
-        <entry key="607f3408-56e6-45de-b701-eecdcddf3069" value="/sessions/d056904f-1b87-4b05-924c-3be4efa2a1c2" />
+        <entry key="403ca504-833e-481e-813c-2d0a528a96f1" value="/sessions/e34fcaed-5ab2-4173-bcd5-35f36abfc27c" />
         <entry key="6099fcee-fda1-4202-b63d-55cf185c48e1" value="/switch-account" />
         <entry key="ed04cedb-ed13-4de3-8166-00c96a35bb30" value="/switch-account" />
       </map>
     </option>
     <option name="sessionTitles">
       <map>
-        <entry key="607f3408-56e6-45de-b701-eecdcddf3069" value="review this project and suggest any changes" />
+        <entry key="403ca504-833e-481e-813c-2d0a528a96f1" value="generate some test data so that i can test" />
         <entry key="6099fcee-fda1-4202-b63d-55cf185c48e1" value="Claude Code" />
         <entry key="ed04cedb-ed13-4de3-8166-00c96a35bb30" value="Claude Code" />
       </map>

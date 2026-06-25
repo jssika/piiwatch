@@ -1,0 +1,25 @@
+PIIWatch Test Data — Clean File
+================================
+This file contains no PII. Use it as a negative test case to confirm
+the scanner returns zero findings.
+
+System metrics for 2024-03-15:
+  - Requests served: 1,482,039
+  - Average latency: 43ms
+  - Error rate: 0.07%
+  - Uptime: 99.98%
+
+Feature flags:
+  - new_checkout_flow: enabled (rollout=100%)
+  - ai_recommendations: enabled (rollout=50%)
+  - dark_mode: disabled
+
+Build info:
+  - Version: 2.14.0
+  - Commit: a3f8bc1
+  - Pipeline: #4421 (passed)
+  - Deployed: 2024-03-15T06:00:00Z
+
+Placeholder values used in docs (intentionally low-confidence):
+  - user@example.com
+  - test@test.com

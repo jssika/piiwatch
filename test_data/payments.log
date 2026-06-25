@@ -1,0 +1,17 @@
+2024-03-15 09:00:01 INFO  [checkout] Payment initiated: user=1001, amount=149.99
+2024-03-15 09:00:02 DEBUG [gateway] Tokenizing card: 4111111111111111 (Visa, exp 04/27)
+2024-03-15 09:00:03 INFO  [gateway] Token created: tok_visa_8f3k2p, original card ending in 1111
+2024-03-15 09:01:14 INFO  [checkout] Payment initiated: user=1003, amount=899.00
+2024-03-15 09:01:15 DEBUG [gateway] Tokenizing card: 5500005555555559 (Mastercard, exp 11/26)
+2024-03-15 09:01:16 INFO  [gateway] Token created: tok_mc_7d2l1m, original card ending in 5559
+2024-03-15 09:02:30 WARN  [fraud] High-risk transaction flagged, card: 378282246310005 (Amex), score=0.82
+2024-03-15 09:02:31 INFO  [fraud] Manual review queued for txn TXN-8847
+2024-03-15 09:03:45 INFO  [checkout] Payment initiated: user=1007, amount=29.99
+2024-03-15 09:03:46 DEBUG [gateway] Tokenizing card: 6011111111111117 (Discover, exp 09/25)
+2024-03-15 09:03:47 INFO  [gateway] Token created: tok_disc_3a9z8q, original card ending in 1117
+2024-03-15 09:04:58 ERROR [gateway] Card declined: 4222222222222 (Visa), insufficient funds
+2024-03-15 09:05:10 INFO  [refund] Refund issued to card 5105105105105100 (Mastercard), amount=149.99
+2024-03-15 09:06:22 DEBUG [raw-log] FULL CARD DATA (pre-masking bug): 4532015112830366 exp=06/28 cvv=737
+2024-03-15 09:07:33 INFO  [checkout] Successful purchase: user=1009, card=****4485, txn=TXN-9901
+2024-03-15 09:08:44 INFO  [checkout] Successful purchase: user=1002, card=****3030, txn=TXN-9902
+2024-03-15 09:09:55 WARN  [pci] Unmasked card number written to log at line 13 — remediate immediately
