@@ -119,3 +119,42 @@ def test_no_findings_message(tmp_path):
 
     assert result.exit_code == 0
     assert "no findings" in result.output
+
+
+def test_ai_provider_missing_sdk_fails_gracefully(tmp_path):
+    # In this environment neither the anthropic nor openai SDK is
+    # installed, so this exercises the real "SDK not available" path --
+    # the CLI must report a clear error and exit non-zero, not crash.
+    log_file = tmp_path / "app.log"
+    log_file.write_text("email a@b.com")
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["scan", str(log_file), "--ai-provider", "anthropic"])
+
+    assert result.exit_code != 0
+    assert "anthropic" in result.output.lower()
+
+
+def test_ai_provider_invalid_choice_rejected_by_click(tmp_path):
+    log_file = tmp_path / "app.log"
+    log_file.write_text("email a@b.com")
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["scan", str(log_file), "--ai-provider", "not-a-real-provider"])
+
+    assert result.exit_code != 0
+    assert "Invalid value" in result.output or "invalid choice" in result.output.lower()
+
+
+def test_scan_without_ai_provider_unaffected(tmp_path):
+    # Sanity check: omitting --ai-provider entirely must still work
+    # exactly as before, with zero AI involvement.
+    log_file = tmp_path / "app.log"
+    log_file.write_text("email a@b.com")
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ["scan", str(log_file), "--json"])
+
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert "ai_review" not in data["findings"][0]

@@ -42,6 +42,12 @@ piiwatch scan ./logs --recursive --fail-on critical
 
 # Show surrounding context for each finding
 piiwatch scan app.log --verbose
+
+# Enable AI-assisted review of ambiguous findings (requires pip install piiwatch[ai] and ANTHROPIC_API_KEY)
+piiwatch scan app.log --ai-provider anthropic
+
+# Same, using OpenAI instead (requires pip install piiwatch[ai-openai] and OPENAI_API_KEY)
+piiwatch scan app.log --ai-provider openai
 ```
 
 Example output:
@@ -62,6 +68,36 @@ LOW       phone           *********0148                               27.0  app.
 ```
 
 Color output respects the [`NO_COLOR`](https://no-color.org) convention and auto-disables when stdout isn't a terminal (e.g. when piping to a file).
+
+### AI-assisted classification
+
+The rule-based detectors deliberately assign middling confidence to genuinely ambiguous matches (an unformatted 10-digit number, a borderline-entropy "secret", an SSN-shaped number with no other signal) rather than guessing. PIIWatch can optionally send *only those ambiguous findings* -- never the whole document, never confident matches -- to an LLM along with a small window of surrounding context, and ask it to confirm, reject, or correct the classification.
+
+```bash
+piiwatch scan app.log --ai-provider anthropic            # use Claude
+piiwatch scan app.log --ai-provider openai                # use OpenAI
+piiwatch scan app.log --ai-provider anthropic --ai-all     # review every finding, not just ambiguous ones
+piiwatch scan app.log --ai-provider anthropic --ai-send-raw  # send unredacted values for more accurate review (see privacy note below)
+```
+
+**Privacy default:** by default, the *matched value itself* is redacted before being sent to the provider -- the model sees something like `***-**-6789` plus surrounding text, not the real number. Pass `--ai-send-raw` only if you've made an informed decision about the provider's data handling (e.g. a zero-data-retention agreement, or a self-hosted model).
+
+**Reliability guarantee:** the AI layer can only ever refine results, never break a scan. Missing API key, network failure, rate limiting, malformed model output -- any failure falls back silently to the original rule-based finding. A misconfigured or unavailable AI provider never crashes or blocks a scan; `piiwatch scan` still works perfectly well without `--ai-provider` at all.
+
+In code:
+
+```python
+from piiwatch import PIIWatchEngine
+from piiwatch.ai import AIClassifier, build_provider
+
+provider = build_provider("anthropic")  # reads ANTHROPIC_API_KEY from env
+classifier = AIClassifier(provider=provider)
+engine = PIIWatchEngine(classifier=classifier)
+
+result = engine.scan("tracking id 3125550148 attached to this order")
+# AI likely rejects this as a false positive given the "tracking id" context,
+# whereas the same digits next to "customer callback number:" would be confirmed.
+```
 
 ### Python API
 
@@ -94,10 +130,15 @@ piiwatch/
 │   ├── api_key.py     # known provider formats + entropy-based generic secret detection
 │   └── registry.py    # DEFAULT_DETECTORS list
 ├── scoring.py         # Severity + risk score assignment, independent of detection logic
-├── engine.py          # PIIWatchEngine: orchestrates detectors, dedupes, scores
+├── engine.py          # PIIWatchEngine: orchestrates detectors, dedupes, scores, optional AI review
 ├── file_discovery.py  # Recursive file discovery for directory scans
 ├── cli.py             # `piiwatch scan` command (click-based)
-├── ai/                # AI-assisted contextual classification (planned)
+├── ai/
+│   ├── provider.py            # LLMProvider protocol, LLMRequest/LLMError
+│   ├── anthropic_provider.py  # Anthropic SDK adapter
+│   ├── openai_provider.py     # OpenAI SDK adapter
+│   ├── factory.py             # build_provider(name) construction helper
+│   └── classifier.py          # AIClassifier: reviews ambiguous findings, redacts by default
 └── reporting/
     └── terminal.py     # Dependency-free ANSI formatting for CLI output
     # JSON/CSV/HTML report generation (planned)
@@ -110,7 +151,7 @@ pip install -e ".[dev]"
 pytest
 ```
 
-(If `pytest` isn't available in your environment, `python run_tests.py` is a dependency-free fallback that runs the same test functions.)
+(If `pytest` isn't available in your environment, `python run_tests.py` is a dependency-free fallback that runs the same test functions, including a `FakeProvider`/`MalformedProvider` test double for the AI layer so the test suite never makes real network calls.)
 
 ## Roadmap
 
@@ -118,7 +159,7 @@ pytest
 - [x] Risk scoring and severity assessment
 - [x] Detection engine with overlap deduplication
 - [x] CLI for scanning files, directories, and stdin (with CI-friendly `--fail-on`)
-- [ ] AI-assisted contextual classification (LLM-based) for ambiguous matches
+- [x] AI-assisted contextual classification (Anthropic/OpenAI) for ambiguous matches, with type correction, redaction-by-default, and graceful fallback on any failure
 - [ ] JSON / CSV / HTML reporting
 - [ ] Structured (JSON) log ingestion
 - [ ] OpenSearch integration for enterprise-scale analysis

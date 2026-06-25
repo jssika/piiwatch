@@ -74,6 +74,15 @@ class Finding:
             transaction log).
         metadata: Free-form extra detail specific to the detector (e.g.
             card brand, key provider name).
+        ai_reviewed: Whether an AI classifier examined this finding.
+        ai_verdict: "confirmed", "rejected", or "retyped" if AI-reviewed,
+            else None. "retyped" means the AI judged this is PII but of a
+            different type than the rule-based detector assigned.
+        ai_reasoning: Short natural-language justification from the AI
+            classifier, for human review/audit trails.
+        corrected_type: If the AI classifier judged the original
+            pii_type to be wrong, the type it believes is correct.
+            None if no correction was suggested.
     """
 
     pii_type: PIIType
@@ -85,6 +94,10 @@ class Finding:
     source: str = ""
     context: str = ""
     metadata: dict = field(default_factory=dict)
+    ai_reviewed: bool = False
+    ai_verdict: str | None = None
+    ai_reasoning: str | None = None
+    corrected_type: PIIType | None = None
 
     @property
     def redacted_value(self) -> str:
@@ -105,6 +118,12 @@ class Finding:
             "context": self.context,
             "metadata": self.metadata,
         }
+        if self.ai_reviewed:
+            d["ai_review"] = {
+                "verdict": self.ai_verdict,
+                "reasoning": self.ai_reasoning,
+                "corrected_type": self.corrected_type.value if self.corrected_type else None,
+            }
         return d
 
 
