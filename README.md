@@ -127,6 +127,45 @@ result = engine.scan("tracking id 3125550148 attached to this order")
 
 ## How it works
 
+```mermaid
+flowchart TD
+    Input["Input\nfile · directory · stdin"]
+    CLI["CLI\npiiwatch scan"]
+    Discovery["File Discovery\nfile_discovery.py"]
+    Engine["PIIWatchEngine\nengine.py"]
+
+    subgraph Detectors
+        D1["SSN\nregex + SSA range check"]
+        D2["Credit Card\nregex + Luhn checksum"]
+        D3["Email\nRFC-5322 pattern"]
+        D4["Phone\nformatted NANP variants"]
+        D5["API Key / Secret\nprovider prefixes + entropy"]
+    end
+
+    Dedupe["Deduplicate\noverlapping spans"]
+
+    subgraph AI ["AI Classifier (optional)"]
+        direction LR
+        Ambiguous["ambiguous\nfindings only"]
+        LLM["LLM\nAnthropic · OpenAI"]
+        Ambiguous --> LLM
+    end
+
+    Scoring["Scoring\nseverity · risk score 0–100"]
+
+    subgraph Output
+        Terminal["Terminal\ncolored table"]
+        JSON["JSON\n--json flag"]
+    end
+
+    Input --> CLI --> Discovery --> Engine
+    Engine --> Detectors
+    Detectors --> Dedupe
+    Dedupe --> AI
+    AI --> Scoring
+    Scoring --> Output
+```
+
 PIIWatch narrows detection down in layers to reduce false positives:
 
 1. **Pattern matching** — candidate values are found via regex.
