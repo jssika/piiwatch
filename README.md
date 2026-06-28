@@ -1,14 +1,21 @@
 # PIIWatch — Open-Source PII Detection and Secret Scanner for Python
 
-**Scan log files, config files, CSVs, and text streams for exposed Personally Identifiable Information (PII) and leaked secrets. Detects SSNs, credit card numbers, API keys, emails, and phone numbers using a hybrid of rule-based validation and AI-assisted contextual classification.**
+[![PyPI](https://img.shields.io/pypi/v/piiwatch)](https://pypi.org/project/piiwatch/)
+[![Python](https://img.shields.io/pypi/pyversions/piiwatch)](https://pypi.org/project/piiwatch/)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![Tests](https://img.shields.io/github/actions/workflow/status/jssika/piiwatch/tests.yml?label=tests)](https://github.com/jssika/piiwatch/actions)
+
+**Scan log files, config files, CSVs, and text streams for exposed Personally Identifiable Information (PII) and leaked secrets. Detects Social Security Numbers, credit card numbers, API keys, email addresses, and phone numbers using a hybrid of rule-based validation and AI-assisted contextual classification.**
 
 PIIWatch is an open-source Python tool that helps security engineers, data engineers, and compliance teams find and triage sensitive data leakage in enterprise systems. It works on log files, environment configs, application output, and any text stream — from the CLI or as an embeddable Python library.
+
+> Lightweight alternative to [detect-secrets](https://github.com/Yelp/detect-secrets) and [Presidio](https://github.com/microsoft/presidio) with built-in AI classification, multi-format reporting (CSV, HTML, SARIF), and zero heavyweight dependencies.
 
 ## What PIIWatch detects
 
 | PII / Secret Type | Detection method |
 |---|---|
-| Social Security Numbers (SSN) | Regex + SSA invalid-range exclusion |
+| Social Security Numbers (SSN / Social Security Number) | Regex + SSA invalid-range exclusion |
 | Credit card numbers | Regex + Luhn checksum + brand prefix (Visa, Mastercard, Amex, Discover, JCB) |
 | Email addresses | RFC-5322-style pattern with low-signal domain filtering |
 | US phone numbers | Formatted variants: `(312) 555-0148`, `312-555-0148`, `+1 312 555 0148` |
@@ -28,7 +35,7 @@ Every finding is assigned a **confidence score** (how certain the match is) and 
 ## Quick start
 
 ```bash
-pip install -e .
+pip install piiwatch
 
 # Scan a single log file
 piiwatch scan app.log
@@ -39,17 +46,14 @@ piiwatch scan ./logs --recursive
 # Scan stdin — works with pipes
 cat app.log | piiwatch scan -
 
-# Machine-readable JSON output for scripting or CI
-piiwatch scan app.log --json
-
-# Fail with exit code 1 if any critical finding is present — useful in CI gates
-piiwatch scan ./logs --recursive --fail-on critical
+# Only surface high-confidence findings
+piiwatch scan app.log --min-confidence 0.8
 
 # Show surrounding context for each finding
 piiwatch scan app.log --verbose
 
-# Only surface high-confidence findings
-piiwatch scan app.log --min-confidence 0.8
+# Fail with exit code 1 if any critical finding is present — useful in CI gates
+piiwatch scan ./logs --recursive --fail-on critical
 
 # AI-assisted review of ambiguous findings (requires pip install piiwatch[ai] and ANTHROPIC_API_KEY)
 piiwatch scan app.log --ai-provider anthropic
@@ -76,6 +80,50 @@ LOW       phone           *********0148                               27.0  app.
 ```
 
 Matched values are redacted in all output by default. Color output respects the [`NO_COLOR`](https://no-color.org) convention and auto-disables when stdout isn't a terminal.
+
+## Report formats
+
+PIIWatch can output findings in six formats via `--format`. Use `--output <file>` to write to a file instead of stdout.
+
+| Format | Flag | Use case |
+|---|---|---|
+| Terminal | `--format terminal` | Default — colored table for interactive use |
+| JSON | `--format json` or `--json` | Scripting, piping into other tools |
+| CSV | `--format csv` | Open in Excel / Google Sheets |
+| Markdown | `--format markdown` | GitHub PRs, docs, Notion |
+| HTML | `--format html` | Shareable standalone visual report |
+| SARIF | `--format sarif` | GitHub Security tab, VS Code, CI integration |
+
+```bash
+# Save a CSV report
+piiwatch scan ./logs --recursive --format csv --output report.csv
+
+# Generate an HTML report
+piiwatch scan ./logs --recursive --format html --output report.html
+
+# SARIF output for GitHub — upload with github/codeql-action/upload-sarif
+piiwatch scan ./logs --recursive --format sarif --output results.sarif
+
+# Markdown report to pipe into a PR comment or doc
+piiwatch scan ./logs --recursive --format markdown --output findings.md
+
+# JSON to stdout for scripting
+piiwatch scan app.log --format json | jq '.findings[] | select(.severity == "critical")'
+```
+
+### Using SARIF in GitHub Actions
+
+```yaml
+- name: Scan for PII
+  run: piiwatch scan . --recursive --format sarif --output results.sarif --fail-on high
+
+- name: Upload to GitHub Security
+  uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: results.sarif
+```
+
+Findings will appear inline on PRs and in your repository's **Security → Code scanning** tab.
 
 ## Python API
 
@@ -106,6 +154,7 @@ piiwatch scan app.log --ai-provider anthropic             # use Claude
 piiwatch scan app.log --ai-provider openai                # use OpenAI
 piiwatch scan app.log --ai-provider anthropic --ai-all    # review every finding, not just ambiguous ones
 piiwatch scan app.log --ai-provider anthropic --ai-send-raw  # send unredacted values for higher accuracy
+piiwatch scan app.log --ai-provider anthropic --ai-model claude-opus-4-8  # override model
 ```
 
 **Privacy default:** matched values are redacted before being sent to the provider — the model sees `***-**-6789` plus surrounding context, not the real number. Pass `--ai-send-raw` only if you've made an informed decision about the provider's data handling (e.g. a zero-data-retention agreement, or a self-hosted model).
@@ -155,7 +204,11 @@ flowchart TD
 
     subgraph Output
         Terminal["Terminal\ncolored table"]
-        JSON["JSON\n--json flag"]
+        JSON["JSON"]
+        CSV["CSV"]
+        Markdown["Markdown"]
+        HTML["HTML"]
+        SARIF["SARIF"]
     end
 
     Input --> CLI --> Discovery --> Engine
@@ -187,17 +240,14 @@ The `test_data/` directory contains realistic sample files covering every PII ty
 | `clean.txt` | No real PII — use as a negative test to confirm zero high-confidence findings |
 
 ```bash
-# Scan a single test file
-piiwatch scan test_data/app.log
-
-# Scan all test files at once
-piiwatch scan test_data/ --recursive
+# Scan all test files and get an HTML report
+piiwatch scan test_data/ --recursive --format html --output report.html
 
 # Only surface high-confidence findings
 piiwatch scan test_data/users.csv --min-confidence 0.8
 
 # Machine-readable output
-piiwatch scan test_data/payments.log --json
+piiwatch scan test_data/payments.log --format json
 
 # Show surrounding context for each finding
 piiwatch scan test_data/config.env --verbose
@@ -238,8 +288,27 @@ piiwatch/
 │   ├── factory.py             # build_provider(name) construction helper
 │   └── classifier.py          # AIClassifier: reviews ambiguous findings, redacts by default
 └── reporting/
-    └── terminal.py     # Dependency-free ANSI formatting for CLI output
-    # JSON/CSV/HTML report generation (planned)
+    ├── terminal.py         # Dependency-free ANSI formatting for CLI output
+    ├── csv_reporter.py     # CSV export
+    ├── markdown_reporter.py # GitHub-flavored Markdown
+    ├── html_reporter.py    # Standalone HTML report
+    └── sarif_reporter.py   # SARIF 2.1.0 for GitHub / VS Code integration
+```
+
+## Installation
+
+```bash
+# Core (CLI + all detectors)
+pip install piiwatch
+
+# With Anthropic AI review
+pip install piiwatch[ai]
+
+# With OpenAI AI review
+pip install piiwatch[ai-openai]
+
+# For development and testing
+pip install piiwatch[dev]
 ```
 
 ## Roadmap
@@ -249,7 +318,8 @@ piiwatch/
 - [x] Detection engine with overlap deduplication
 - [x] CLI for scanning files, directories, and stdin (with CI-friendly `--fail-on`)
 - [x] AI-assisted contextual classification (Anthropic/OpenAI) for ambiguous matches, with type correction, redaction-by-default, and graceful fallback on any failure
-- [ ] JSON / CSV / HTML reporting
+- [x] Multiple report formats: JSON, CSV, Markdown, HTML, SARIF
+- [x] SARIF output for GitHub Security tab and VS Code integration
 - [ ] Structured (JSON) log ingestion
 - [ ] OpenSearch integration for enterprise-scale analysis
 - [ ] Cloud-native deployment for AWS environments

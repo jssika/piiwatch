@@ -7,8 +7,15 @@ Supports three input modes:
   - A directory (recurse): piiwatch scan ./logs --recursive
   - Stdin:                 cat app.log | piiwatch scan -
 
-Output is a pretty colored summary + table by default; pass --json for
-machine-readable output suitable for piping into other tools or CI.
+Output formats (--format):
+  terminal  Colored table, default for interactive use
+  json      Machine-readable JSON
+  csv       Spreadsheet-friendly CSV
+  markdown  GitHub-flavored Markdown
+  html      Standalone HTML report
+  sarif     SARIF 2.1.0 for GitHub / VS Code security integration
+
+Use --output <file> to write the report to a file instead of stdout.
 """
 
 from __future__ import annotations
@@ -22,6 +29,10 @@ import click
 from piiwatch.engine import PIIWatchEngine
 from piiwatch.file_discovery import DEFAULT_EXTENSIONS, discover_files
 from piiwatch.reporting.terminal import bold, dim, severity_label, render_table
+from piiwatch.reporting.csv_reporter import render_csv
+from piiwatch.reporting.markdown_reporter import render_markdown
+from piiwatch.reporting.html_reporter import render_html
+from piiwatch.reporting.sarif_reporter import render_sarif
 
 
 def _build_engine(*, ai_provider: str | None, ai_model: str | None, ai_send_raw: bool) -> PIIWatchEngine:
@@ -65,6 +76,23 @@ def _merge_results(results: list[dict]) -> dict:
     from piiwatch.scoring import summarize
 
     return {"summary": summarize(all_findings), "findings": all_findings}
+
+
+def _render(result: dict, fmt: str, *, verbose: bool) -> str | None:
+    """Return the rendered report string, or None for terminal (printed directly)."""
+    if fmt == "json":
+        return json.dumps(result, indent=2)
+    if fmt == "csv":
+        return render_csv(result)
+    if fmt == "markdown":
+        return render_markdown(result)
+    if fmt == "html":
+        return render_html(result)
+    if fmt == "sarif":
+        return render_sarif(result)
+    # terminal
+    _print_human(result, verbose=verbose)
+    return None
 
 
 def _print_human(result: dict, *, verbose: bool) -> None:
@@ -131,7 +159,15 @@ def cli():
     help="When scanning a directory, scan every file regardless of extension (default: common log/text formats only).",
 )
 @click.option("--min-confidence", default=0.0, show_default=True, type=float, help="Drop findings below this confidence (0.0-1.0).")
-@click.option("--json", "as_json", is_flag=True, help="Output raw JSON instead of a formatted summary.")
+@click.option("--json", "as_json", is_flag=True, help="Shorthand for --format json.")
+@click.option(
+    "--format", "fmt",
+    type=click.Choice(["terminal", "json", "csv", "markdown", "html", "sarif"]),
+    default="terminal",
+    show_default=True,
+    help="Output format.",
+)
+@click.option("--output", "-o", default=None, help="Write report to this file instead of stdout.")
 @click.option("--verbose", "-v", is_flag=True, help="Include surrounding context for each finding.")
 @click.option("--fail-on", type=click.Choice(["critical", "high", "medium", "low", "info", "none"]), default="none", help="Exit with a non-zero status if any finding meets or exceeds this severity. Useful in CI.")
 @click.option(
@@ -161,6 +197,8 @@ def scan(
     all_files: bool,
     min_confidence: float,
     as_json: bool,
+    fmt: str,
+    output: str | None,
     verbose: bool,
     fail_on: str,
     ai_provider: str | None,
@@ -172,6 +210,9 @@ def scan(
 
     PATH may be a file, a directory, or "-" to read from stdin.
     """
+    if as_json:
+        fmt = "json"
+
     engine = _build_engine(ai_provider=ai_provider, ai_model=ai_model, ai_send_raw=ai_send_raw)
     results: list[dict] = []
 
@@ -201,10 +242,13 @@ def scan(
 
     merged = _merge_results(results)
 
-    if as_json:
-        click.echo(json.dumps(merged, indent=2))
-    else:
-        _print_human(merged, verbose=verbose)
+    rendered = _render(merged, fmt, verbose=verbose)
+    if rendered is not None:
+        if output:
+            Path(output).write_text(rendered)
+            click.echo(f"Report written to {output}", err=True)
+        else:
+            click.echo(rendered)
 
     if fail_on != "none":
         severity_rank = ["info", "low", "medium", "high", "critical"]
