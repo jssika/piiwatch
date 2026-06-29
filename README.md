@@ -1,7 +1,7 @@
 # PIIWatch — Open-Source PII Detection and Secret Scanner for Python
 
-[![PyPI](https://img.shields.io/pypi/v/piiwatch)](https://pypi.org/project/piiwatch/)
-[![Python](https://img.shields.io/pypi/pyversions/piiwatch)](https://pypi.org/project/piiwatch/)
+[![PyPI](https://img.shields.io/badge/pypi-v0.1.0-blue)](https://pypi.org/project/piiwatch/)
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/piiwatch/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/jssika/piiwatch/tests.yml?label=tests)](https://github.com/jssika/piiwatch/actions)
 

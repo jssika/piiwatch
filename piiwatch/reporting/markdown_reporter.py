@@ -25,7 +25,7 @@ def render_markdown(result: dict) -> str:
 
     if not findings:
         lines.append("No findings.")
-        return "\n".join(lines)
+        return "\n".join(lines) + "\n"
 
     lines.append("## Findings\n")
     lines.append("| Severity | Type | Value | Risk | File | AI Verdict |")
