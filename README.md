@@ -1,7 +1,7 @@
 # PIIWatch — Open-Source PII Detection and Secret Scanner for Python
 
-[![PyPI](https://img.shields.io/badge/pypi-v0.1.0-blue)](https://pypi.org/project/piiwatch/)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://pypi.org/project/piiwatch/)
+[![PyPI](https://img.shields.io/pypi/v/piiwatch)](https://pypi.org/project/piiwatch/)
+[![Python](https://img.shields.io/pypi/pyversions/piiwatch)](https://pypi.org/project/piiwatch/)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Tests](https://img.shields.io/github/actions/workflow/status/jssika/piiwatch/tests.yml?label=tests)](https://github.com/jssika/piiwatch/actions)
 
@@ -19,8 +19,8 @@ PIIWatch is an open-source Python tool that helps security engineers, data engin
 | **pip (with AI)** | `pip install piiwatch[ai]` |
 | **PyPI page** | [pypi.org/project/piiwatch](https://pypi.org/project/piiwatch/) |
 | **GitHub release** | [github.com/jssika/piiwatch/releases/tag/v0.1.0](https://github.com/jssika/piiwatch/releases/tag/v0.1.0) |
-| **Source (.tar.gz)** | [piiwatch-0.1.0.tar.gz](https://github.com/jssika/piiwatch/releases/download/v0.1.0/piiwatch-0.1.0.tar.gz) |
-| **Wheel (.whl)** | [piiwatch-0.1.0-py3-none-any.whl](https://github.com/jssika/piiwatch/releases/download/v0.1.0/piiwatch-0.1.0-py3-none-any.whl) |
+| **Source (.tar.gz)** | [piiwatch-0.1.0.tar.gz](https://files.pythonhosted.org/packages/source/p/piiwatch/piiwatch-0.1.0.tar.gz) |
+| **Wheel (.whl)** | [piiwatch-0.1.0-py3-none-any.whl](https://files.pythonhosted.org/packages/py3/p/piiwatch/piiwatch-0.1.0-py3-none-any.whl) |
 | **Clone** | `git clone https://github.com/jssika/piiwatch.git` |
 
 ## What PIIWatch detects
