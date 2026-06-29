@@ -11,6 +11,18 @@ PIIWatch is an open-source Python tool that helps security engineers, data engin
 
 > Lightweight alternative to [detect-secrets](https://github.com/Yelp/detect-secrets) and [Presidio](https://github.com/microsoft/presidio) with built-in AI classification, multi-format reporting (CSV, HTML, SARIF), and zero heavyweight dependencies.
 
+## Download / Install
+
+| Method | Command / Link |
+|--------|----------------|
+| **pip** | `pip install piiwatch` |
+| **pip (with AI)** | `pip install piiwatch[ai]` |
+| **PyPI page** | [pypi.org/project/piiwatch](https://pypi.org/project/piiwatch/) |
+| **GitHub release** | [github.com/jssika/piiwatch/releases/tag/v0.1.0](https://github.com/jssika/piiwatch/releases/tag/v0.1.0) |
+| **Source (.tar.gz)** | [piiwatch-0.1.0.tar.gz](https://github.com/jssika/piiwatch/releases/download/v0.1.0/piiwatch-0.1.0.tar.gz) |
+| **Wheel (.whl)** | [piiwatch-0.1.0-py3-none-any.whl](https://github.com/jssika/piiwatch/releases/download/v0.1.0/piiwatch-0.1.0-py3-none-any.whl) |
+| **Clone** | `git clone https://github.com/jssika/piiwatch.git` |
+
 ## What PIIWatch detects
 
 | PII / Secret Type | Detection method |
